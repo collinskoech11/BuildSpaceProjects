@@ -1,11 +1,11 @@
 const main = async () => {
-    const [deployer] = await Headers.ethers.getSigners();
+    const [deployer] = await hre.ethers.getSigners();
     const accountBalance = await deployer.getBalance();
 
     console.log("Deploying contract with account : ", deployer.address);
     console.log("account Balance : ", accountBalance.toString());
 
-    const waveContractFactory = await Headers.ethers.getContractFactory("WavePortal");
+    const waveContractFactory = await hre.ethers.getContractFactory("WavePortal");
     const waveContract = await waveContractFactory.deploy();
     await waveContract.deployed();
 
@@ -15,6 +15,11 @@ const main = async () => {
 const runMain = async () =>{
     try{
         await main();
-        ProcessingInstruction.
+        process.exit(0)
+    } catch (error){
+        console.log(error)
+        process.exit(1)
     }
-}
+};
+
+runMain();
