@@ -6,8 +6,13 @@ import abi from "./utils/WavePortal.json"
 
 function App() {
   const contractABI = abi.abi;
-  const contractAddress = "0xaCFaef0E39B91b23E9BFa172Ad37c30378ffC946"
+  const contractAddress = "0x4B57fde21Be0109BDC9C36DC38e8d95702C7A5E7"
   const [currentAccount, setCurrentAccount] = useState("")
+  const [allWaves, setAllWaves] = useState([])
+  const [message, setMessage] = useState("")
+  
+
+
   const checkIfWalletIsConnected = async() => {
     try{
       const {ethereum} = window;
@@ -50,6 +55,7 @@ function App() {
     }
   }
   const wave = async() => {
+    console.log("CLICKED")
     try{
       const {ethereum} = window;
       if (ethereum) {
@@ -60,7 +66,7 @@ function App() {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retreived total wave count...", count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave(message);
         console.log("Mining", waveTxn.hash);
 
         await waveTxn.wait();
@@ -72,6 +78,35 @@ function App() {
         console.log("Ethereum object does not exist")
       }
     } catch (error){
+      console.log(error)
+    }
+  }
+  const handleMessage =  (e) =>{
+    setMessage(e.target.value);
+  }
+  const getAllWaves = async () => {
+    try{
+      const {ethereum} = window;
+      if(ethereum){
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const waves = await wavePortalContract.getAllWaves();
+
+        let wavesCleaned = [];
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp* 1000),
+            message: wave.message
+          });
+        });
+        setAllWaves(wavesCleaned);
+      } else {
+        console.log("Ethereum object does not exist")
+      }
+    } catch(error){
       console.log(error)
     }
   }
@@ -89,14 +124,25 @@ function App() {
           <div className="bio">
             I am farza and I worked on self-driving cars so that's pretty cool right? Connect your Ethereum wallet and wave at me!
           </div>
-
+          <input type="text" onChange={handleMessage}/>
           <button className="waveButton" onClick={wave}>
             Wave at Me
           </button>
+          <button onClick={getAllWaves}>get</button>
           {/**render connect button if there is no account */}
           {!currentAccount && (
             <button onClick={connectWallet}> connect Wallet</button>
           )}
+
+          {allWaves.map((wave, index) => {
+            return (
+              <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
+                <div>Address: {wave.address}</div>
+                <div>Time: {wave.timestamp.toString()}</div>
+                <div>Message: {wave.message}</div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
