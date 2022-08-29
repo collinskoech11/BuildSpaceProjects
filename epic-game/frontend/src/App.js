@@ -2,13 +2,31 @@ import React, {useEffect, useState} from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
 import SelectCharacter from './Components/SelectCharacter';
+import {CONTRACT_ADDRESS, transformCharacterData} from "./constants"
+import {ethers} from "ethers"
+import myEpicGame from './utils/MyEpicGame.json'
+import Arena from "./Components/Arena"
+// import { transform } from 'typescript';
 // Constants
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
+
+
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState(null);
   const [characterNFT, setCharacterNFT] = useState(null);
+
+  
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== '4'){
+        alert("Please connect to Rinkeby!")
+      }
+    } catch(error){
+      console.log(error)
+    }
+  }
   const checkIfWalletIsConnected = async() => {
     try{
     const {ethereum } = window;
@@ -75,8 +93,32 @@ const App = () => {
   }
   
   useEffect(() => {
+    const fetchNFTMetadata = async () => {
+      console.log('Checking for Character NFT on address : ', currentAccount);
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer  =  provider.getSigner();
+      const gameContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        myEpicGame.abi,
+        signer
+      );
+
+      const txn = await gameContract.checkIfUserHasNFT();
+      if (txn.name) {
+        console.log('User has character NFT');
+        setCharacterNFT(transformCharacterData(txn));
+      } else {
+        console.log("No character NFT found");
+      }
+    };
+    // we want to only run this if we have a connected wallet
+    if(currentAccount){
+      console.log('Current Account : ', currentAccount);
+      fetchNFTMetadata();
+    }
     checkIfWalletIsConnected();
-  }, []);
+  }, [currentAccount]);
   return (
     <div className="App">
       <div className="container">

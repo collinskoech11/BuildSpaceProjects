@@ -16,15 +16,15 @@ const main = async () => {
   await  gameContract.deployed();//wait for tx to be mined
   console.log("Contract deployed to:", gameContract.address);//log the address of the deployed smart contract
 
-  let txn;
-  txn = await gameContract.mintCharacterNFT(2);// mint Pikachus NFT
-  await txn.wait();
+  // let txn;
+  // txn = await gameContract.mintCharacterNFT(2);// mint Pikachus NFT
+  // await txn.wait();
 
-  txn = await gameContract.attackBoss();// Pikachu attacks Elon Musk
-  await txn.wait();
+  // txn = await gameContract.attackBoss();// Pikachu attacks Elon Musk
+  // await txn.wait();
 
-  txn = await gameContract.attackBoss();// Pikacu attacks Elon Musk gain 
-  await txn.wait();
+  // txn = await gameContract.attackBoss();// Pikacu attacks Elon Musk gain 
+  // await txn.wait();
 
 
   console.log("done");

@@ -162,7 +162,7 @@ contract MyEpicGame is ERC721 {
         emit AttackComplete(msg.sender, bigBoss.hp, player.hp);
     }
 
-    function chackIfUserHasNFT() public view returns (CharacterAttributes memory) {
+    function checkIfUserHasNFT() public view returns (CharacterAttributes memory) {
         // get the token id of the users character NFT
         uint256 userNftTokenId = nftHolders[msg.sender];
         // If the user has a tokenId in the map, return their character
