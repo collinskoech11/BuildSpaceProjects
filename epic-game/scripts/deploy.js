@@ -1,31 +1,48 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
-const hre = require("hardhat");
 
-async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+const main = async () => {
+  const gameContractFactory = await hre.ethers.getContractFactory('MyEpicGame');//compile MyEpicGame.sol contract
+  const gameContract = await gameContractFactory.deploy(
+      ["Leo", "Aang", "Pikachu"],
+      ["https://i.imgur.com/pKd5Sdk.png",
+      "https://i.imgur.com/xVu4vFL.png",
+      "https://i.imgur.com/WMB6g9u.png"],
+      [100, 200, 300],//hp
+      [100, 50, 25],//attack damage
+      "Elon Musk",
+      "https://i.imgur.com/AksR0tt.png",
+      10000,
+      50
+  );// create local ethereum network
+  await  gameContract.deployed();//wait for tx to be mined
+  console.log("Contract deployed to:", gameContract.address);//log the address of the deployed smart contract
 
-  const lockedAmount = hre.ethers.utils.parseEther("1");
+  let txn;
+  txn = await gameContract.mintCharacterNFT(2);// mint Pikachus NFT
+  await txn.wait();
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  txn = await gameContract.attackBoss();// Pikachu attacks Elon Musk
+  await txn.wait();
 
-  await lock.deployed();
+  txn = await gameContract.attackBoss();// Pikacu attacks Elon Musk gain 
+  await txn.wait();
 
-  console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+
+  console.log("done");
+
+
+  // let returnedTokenUri = await gameContract.tokenURI(1);
+  // console.log("Token URI : ", returnedTokenUri);
+};
+
+
+const runMain = async () => {
+  try {
+      await main();
+      process.exit(0);
+  } catch (error) {
+      console.log(error);
+      process.exit(1)
+  }
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+runMain();

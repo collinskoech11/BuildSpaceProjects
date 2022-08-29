@@ -6,6 +6,9 @@ const main = async () => {
     await WaveContract.deployed();//wait till the contract is deployed to the blockchain
     console.log("Contract deployed to ", WaveContract.address);//gives the address of the deployed contract
 
+    let waveCount; 
+    waveCount = await WaveContract.getTotalWaves();
+    console.log(waveCount.toNumber())
 
     let contractBalance = await hre.ethers.provider.getBalance(
         WaveContract.address
@@ -15,12 +18,10 @@ const main = async () => {
         hre.ethers.utils.formatEther(contractBalance)
     );
 
-    let waveCount; 
-    waveCount = await WaveContract.getTotalWaves();
-    console.log(waveCount.toNumber())
-
     //send a few waves
     let waveTxn = await WaveContract.wave("A message!");
+    let Random = await  WaveContract.seed
+    console.log("Random # generated", Random)
     await waveTxn.wait();// wait for the transacrtion to be mined 
     
     contractBalance = await hre.ethers.provider.getBalance(
@@ -32,8 +33,10 @@ const main = async () => {
     );
     
     // const [_, randomPerson] = await hre.ethers.getSigners();
-    // waveTxn = await WaveContract.connect(randomPerson).wave("Another message");
-    // await waveTxn.wait(); //wait for the transaction to be mined
+    waveTxn = await WaveContract.connect(randomPerson).wave("Another message");
+    Random = await  WaveContract.seed
+    console.log("Random # generated", Random)
+    await waveTxn.wait(); //wait for the transaction to be mined
     
     let allWaves = await WaveContract.getAllWaves();
     console.log(allWaves)

@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 
 contract WavePortal {
     uint256 totalWaves; 
+    uint256 seed;
     event NewWave(address indexed from, uint256 timestamp, string message);
 
     struct Wave {
@@ -38,6 +39,7 @@ contract WavePortal {
         }
         emit NewWave(msg.sender, block.timestamp, _message);
     }
+
     function getAllWaves() public view returns (Wave[] memory) {
         return waves;
     }
